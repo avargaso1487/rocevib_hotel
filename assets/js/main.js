@@ -39,18 +39,42 @@ jQuery(function($) {'use strict',
 	});
 
 	// Contact form
-	var form = $('#main-contact-form');
-	form.submit(function(event){
-		event.preventDefault();
+	var form = $('#main-contact-form-2');
+	$("#submit").click(function(event){
 		var form_status = $('<div class="form_status"></div>');
 		$.ajax({
-			url: $(this).attr('action'),
-
+			type: 'POST',
+			data: $('#main-contact-form-2').serialize(), 				
+			url: 'sendemail.php',
 			beforeSend: function(){
-				form.prepend( form_status.html('<p><i class="fa fa-spinner fa-spin"></i> Email is sending...</p>').fadeIn() );
+					form.prepend( form_status.html('<p><i class="fa fa-spinner fa-spin"></i> Email is sending...</p>').fadeIn() );
+				},
+			success: function(respuesta){
+				form_status.html('<p class="text-success">' + respuesta.message + '</p>').delay(3000).fadeOut();
+			},
+			error: function(respuesta){
+				
 			}
-		}).done(function(data){
-			form_status.html('<p class="text-success">' + data.message + '</p>').delay(3000).fadeOut();
+		});
+	});
+	
+	var form2 = $('#main-contact-form-1');
+	$("#submit2").click(function(event){
+		var form2_status = $('<div class="form2_status"></div>');
+		$.ajax({
+			type: 'POST',
+			data: $('#main-contact-form-1').serialize(), 				
+			url: 'sendemail_reserva.php',
+			beforeSend: function(){
+					form2.prepend( form2_status.html('<p><i class="fa fa-spinner fa-spin"></i> Email is sending...</p>').fadeIn() );
+				},
+			success: function(respuesta){
+				console.log(respuesta);
+				form2_status.html('<p class="text-success">' + respuesta.message + '</p>').delay(3000).fadeOut();
+			},
+			error: function(respuesta){
+			console.log("error");
+			}
 		});
 	});
 

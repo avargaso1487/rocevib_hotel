@@ -10,7 +10,14 @@
     $subject = @trim(stripslashes($_POST['subject'])); 
     $message = @trim(stripslashes($_POST['message'])); 
     $celular = @trim(stripslashes($_POST['celular'])); 
-    $company =  @trim(stripslashes($_POST['company'])); 
+    $company =  @trim(stripslashes($_POST['company']));
+
+    //File
+    $nombre_archivo = $_FILES['archivo']['name'];
+    $tipo_archivo = $_FILES['archivo']['type'];
+    $tamano_archivo = $_FILES['archivo']['size']; 
+    $nombref    = $_FILES["archivo"]["name"];
+
 
     $email_from = $email;
     $email_to = 'informes@hotelrocevib.com';//replace with your email

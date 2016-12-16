@@ -1,3 +1,62 @@
+<?php
+    $status = array(
+        'type'=>'false',
+        'message'=>''
+    );
+
+
+    $email = "informes@isacaunt.com";//EMAILTO; 
+    $message = "Mensaje";//MENSAJE; 
+    $subject = "asunto";//TEMA
+
+    $email_to = $email;
+    $email_from = 'email@email.com';
+
+    $separator = md5(time());
+
+    $eol = PHP_EOL;
+    $estado_imagen = "";
+        $fichero_subido = 'uploads/' . basename($_FILES['archivo']['name']);
+        if(move_uploaded_file($_FILES['archivo']['tmp_name'], $fichero_subido)) { 
+            $estado_imagen = "El voucher ha sido adjuntado exitosamente";
+        } else{
+            $estado_imagen = "Ha ocurrido un error al adjuntar el voucher, trate de nuevo.";
+        } 
+        $filename = $fichero_subido;
+
+    $pdfdoc = file_get_contents($filename);
+    $attachment = chunk_split(base64_encode($pdfdoc));
+
+    $headers  = "From: \"TuEmpresa\"<" . $email_from . ">".$from.$eol;
+    $headers .= "MIME-Version: 1.0".$eol; 
+    $headers .= "Content-Type: multipart/mixed; boundary=\"".$separator."\"";
+
+    $body = "--".$separator.$eol;
+
+    $body .= "Content-Type: text/html; charset=\"utf-8\"".$eol;
+    $body .= "Content-Transfer-Encoding: 8bit".$eol.$eol;
+    $body .= $message.$eol;
+
+    // adjunto
+    $body .= "--".$separator.$eol;
+    $body .= "Content-Type: application/octet-stream; name=\"".$filename."\"".$eol;
+    $body .= "Content-Transfer-Encoding: base64".$eol;
+    $body .= "Content-Disposition: attachment".$eol.$eol;
+    $body .= $attachment.$eol;
+    $body .= "--".$separator."--";
+
+    $status_exito = "";
+
+    $error_ocurred = mail($email_to, $subject, $body, $headers);
+    if(!$error_ocurred){
+        $status["type"]="false";
+        $status_exito="OCURRIÓ UN PROBLEMA AL MOMENTO DE REALIZAR LA RESERVA. VUELVA A INTENTARLO. <a href='reservation.html'>Volver</a>";
+    }else{
+        $status["type"]="true";
+        $status_exito="SU RESERVA HA SIDO REALIZADA.";    
+    }
+    
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,67 +154,17 @@
 
    <section id="blog" class="container">
         <div class="center">
-            <h2>¡Reserva una habitación!</h2>
-            <p class="lead">El depósito se deberá realizar en cualquiera de las siguientes cuentas:<br>
-                <li><b>BANCO CONTINENTAL (Cuenta de ahorros): 0011-0254-03-0200270748 (Eventos Empresariales ROCEVIB E.I.R.L.)</b></li>               
-                <li><b>BANCO DE CRÉDITO DEL PERÚ (Cuenta corriente): 570-2371360005 (Cód. Interbancario: 002570002371360005-06</li></b>
+            <h2>RESULTADO DE LA RESERVA</h2>
+            <p class="lead">
+                <li><b><?php echo $estado_imagen ?></b></li>
+
+                <li><b><?php echo $status_exito ?></li></b>
                 </p>
-            <p class="lead">Tan solo con dejar tus datos, adjuntar el voucher del depósito y tu reserva será realizada.</p>
-        </div>
-            <div class="row contact-wrap"> 
-                <div class="status alert alert-success" style="display: none"></div>
-                <form  class="contact-form" enctype="multipart/form-data" action="sendemail_reserva.php" method="post">
-                    <div class="col-sm-5 col-sm-offset-1">
-                        <div class="form-group">
-                            <label>Nombre *</label>
-                            <input type="text" name="nombre" class="form-control" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label>DNI *</label>
-                            <input type="email" name="email" class="form-control" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label>Celular</label>
-                            <input type="number" class="form-control">
-                        </div>
-                        <div>
-                            <div class="form-group col-sm-6">
-                                <label>Fecha Ingreso *</label>
-                                <input type="text" class="form-control"  required="required">
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label>Fecha Salida *</label>
-                                <input type="text" class="form-control"  required="required">
-                            </div>        
-                        </div>
-                                                
-                    </div>
-                    <div class="col-sm-5">
-                        <div class="form-group">
-                            <label>Apellidos *</label>
-                            <input type="text" name="subject" class="form-control" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label>Email *</label>
-                            <input type="text" name="mail" class="form-control">
-                        </div>                  
-                        <div class="form-group">
-                            <label>Empresa</label>
-                            <input type="text" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>Voucher</label>
-                            <input type="file" name="archivo" class="form-control">
-                        </div>                              
-                        <div class="form-group">
-                            <button type="submit" name="reserva" class="btn btn-primary btn-lg" required="required"> Reserva </button>
-                        </div>
-                    </div>
-                </form> 
-            </div><!--/.row-->
+            <a href="index.html" class="leadf">INICIO</a>
+        </div>           
         </div><!--/.container-->
     </section><!--/#contact-page-->
-
+    
     <section id="bottom">
         <div class="container wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
             <!--<div class="row">
